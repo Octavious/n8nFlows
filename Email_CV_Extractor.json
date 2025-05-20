@@ -1,0 +1,631 @@
+{
+  "name": "Email CV Extractor",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -520,
+        -60
+      ],
+      "id": "2d2e6770-ea4c-49d1-9c22-c46122d4560f",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "4HzeUBcjYoiQiIYO",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an HR expert, you are given a detailed CV text\nextract\nName\nEmail\nTelephone\nExperience\nSkills\nEducation\n\nThis is the CV text:  {{ $json.attachment }}",
+        "hasOutputParser": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        380,
+        -60
+      ],
+      "id": "249530bc-0907-4a91-ae04-32482bbee4d4",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3-0324:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        400,
+        160
+      ],
+      "id": "ed561230-dc1b-40b3-b6b0-453c864201d0",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "9WIIDJqiGxXenPjM",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ca72b4be-9e51-4ecd-824a-1ea0e71acb3c",
+              "name": "from",
+              "value": "={{ $('Gmail Trigger').item.json.from.value[0].address }}",
+              "type": "string"
+            },
+            {
+              "id": "54efecd1-916f-4f1a-b358-a34f044447fc",
+              "name": "subject",
+              "value": "={{ $('Gmail Trigger').item.json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "4f8cf01a-7567-4f80-9d69-2229d369f10f",
+              "name": "body",
+              "value": "={{ $('Gmail Trigger').item.json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "86491e7a-12ac-4d68-a19e-5be065e243e1",
+              "name": "attachment",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        -60
+      ],
+      "id": "6cc071fa-e8b4-4ad2-94cb-3b0ac845bf1c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "attachment_0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -80
+      ],
+      "id": "f9cf8df1-867d-4c06-9b1e-6e95a791333c",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Name\": \"Firstname Lastname\",\n  \"Telephone\": \"01788798797\",\n  \"Email\": \"a@b.com\",\n\t\"Education\": [\"University 1\", \"University 2\"],\n  \"Skill\": [\"Skill 1\", \"Skill 2\", \"Skill 3\"],\n  \"Experience\": [\"Job 1\", \"job 2\", \"job 3\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        540,
+        160
+      ],
+      "id": "24f60a44-c1de-4346-96d5-6c1fd78253cc",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "content": "## Email Trigger",
+        "height": 300,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -200
+      ],
+      "id": "e51373cc-e4cd-4a3b-81e9-1b7d94f7cec6",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Prepare Data",
+        "height": 300,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        -200
+      ],
+      "id": "069c1d3e-5855-4d2c-ac7f-9c4355b17ced",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Extract Information",
+        "height": 500,
+        "width": 540,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        140,
+        -200
+      ],
+      "id": "1d8c9bd6-77cf-4474-aa1b-c2bf996f5f67",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Save Information",
+        "height": 600,
+        "width": 940,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -200
+      ],
+      "id": "073974a3-bc40-4c94-8663-6c691bea4c36",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://qmejxdntnhnvbxkpnfsl.supabase.co/rest/v1/cvs",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtZWp4ZG50bmhudmJ4a3BuZnNsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTg2MDIwMiwiZXhwIjoyMDU1NDM2MjAyfQ.hRUs1r7nCXAgAegRmfTjOKxH2NyGEtDQaiYCRYLWy9o"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtZWp4ZG50bmhudmJ4a3BuZnNsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTg2MDIwMiwiZXhwIjoyMDU1NDM2MjAyfQ.hRUs1r7nCXAgAegRmfTjOKxH2NyGEtDQaiYCRYLWy9o"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $json.output.Name }}"
+            },
+            {
+              "name": "telephone",
+              "value": "={{ $json.output.Telephone }}"
+            },
+            {
+              "name": "email",
+              "value": "={{ $json.output.Email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        -60
+      ],
+      "id": "f2ccc6f0-bd70-4793-ada8-c7a51c74712e",
+      "name": "Save CV Personal Data"
+    },
+    {
+      "parameters": {
+        "tableId": "education",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "cv_id",
+              "fieldValue": "={{ $('Save CV Personal Data').item.json.id }}"
+            },
+            {
+              "fieldId": "text",
+              "fieldValue": "={{ $('Basic LLM Chain').item.json.output.Experience }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        40
+      ],
+      "id": "0acd46fa-fb3d-44dc-8e79-48840f61bf74",
+      "name": "Save Education",
+      "credentials": {
+        "supabaseApi": {
+          "id": "KzFGZNb1BTMRUrcO",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "exp",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        -160
+      ],
+      "id": "a4944019-afc0-41b5-be08-846f1c56efeb",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "edu",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        40
+      ],
+      "id": "37c8f110-0781-4787-b7ff-83ce4fc037e6",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "skills",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        220
+      ],
+      "id": "0adb1c22-8acc-44bc-b703-a400ce8b8cc2",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "13ad25ea-7de4-4338-a4ab-dbd0af7220dc",
+              "name": "exp",
+              "value": "={{ $('Basic LLM Chain').item.json.output.Experience }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1100,
+        -160
+      ],
+      "id": "6101247c-0c6c-45ea-bb1c-db50d710fdc9",
+      "name": "Map Exp Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "13ad25ea-7de4-4338-a4ab-dbd0af7220dc",
+              "name": "edu",
+              "value": "={{ $('Basic LLM Chain').item.json.output.Education }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1100,
+        40
+      ],
+      "id": "7b5b21a8-cae6-4d9a-9493-25c03840685f",
+      "name": "Map Edu Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "13ad25ea-7de4-4338-a4ab-dbd0af7220dc",
+              "name": "skills",
+              "value": "={{ $('Basic LLM Chain').item.json.output.Skill }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1100,
+        220
+      ],
+      "id": "36a60971-ad77-4e4a-9801-e133b11eaa5d",
+      "name": "Map Skills Fields"
+    },
+    {
+      "parameters": {
+        "tableId": "experiences",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "cv_id",
+              "fieldValue": "={{ $('Save CV Personal Data').item.json.id }}"
+            },
+            {
+              "fieldId": "text",
+              "fieldValue": "={{ $('Basic LLM Chain').item.json.output.Experience }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        220
+      ],
+      "id": "6db8f6e6-67c4-44ac-b23f-361891918809",
+      "name": "Save Skills",
+      "credentials": {
+        "supabaseApi": {
+          "id": "KzFGZNb1BTMRUrcO",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "experiences",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "cv_id",
+              "fieldValue": "= {{ $('Save CV Personal Data').item.json.id }}"
+            },
+            {
+              "fieldId": "text",
+              "fieldValue": "={{ $json.exp }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        -160
+      ],
+      "id": "ef8fd141-d123-4af9-9b6c-2c839a5e0219",
+      "name": "Save Experience",
+      "credentials": {
+        "supabaseApi": {
+          "id": "KzFGZNb1BTMRUrcO",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Save CV Personal Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save CV Personal Data": {
+      "main": [
+        [
+          {
+            "node": "Map Exp Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Map Edu Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Map Skills Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Education": {
+      "main": [
+        []
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Save Experience",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Exp Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Edu Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Skills Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Save Skills",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Save Education",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Experience": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b9386987-8b67-4e7c-97c5-f02be8834f5a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "05b6cd2a19105bc7bc8aa65e5b3d953e66815a0e3658654251b6cb708fce0670"
+  },
+  "id": "9HmR1AWzrrIQHbU1",
+  "tags": []
+}

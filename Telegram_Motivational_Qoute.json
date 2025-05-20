@@ -1,0 +1,148 @@
+{
+  "name": "Telegram Motivational Qoute",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "05cee99f-0a37-4a0c-8904-6c050aa7d6a8",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "chatId": "=-1002223171199",
+        "text": "={{ $json[0][0] }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "2e5e833f-0ce8-4289-94b2-e6ea8909d5d5",
+      "name": "Telegram",
+      "webhookId": "c5ea5700-5562-4569-8895-547387f1493e",
+      "credentials": {
+        "telegramApi": {
+          "id": "BANia3J3IXuRWJ99",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": " https://translate.googleapis.com/translate_a/single",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sl",
+              "value": "en"
+            },
+            {
+              "name": "tl",
+              "value": "ar"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.q }}: {{ $json.a }}"
+            },
+            {
+              "name": "client",
+              "value": "gtc"
+            },
+            {
+              "name": "dt",
+              "value": "t"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "28992b39-099c-4347-87c2-db299b08c5f5",
+      "name": "Translate"
+    },
+    {
+      "parameters": {
+        "url": "https://zenquotes.io/api/random",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "30752472-4730-4170-b961-374dc5f6b9a8",
+      "name": "Fetch Qoute"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Qoute",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Qoute": {
+      "main": [
+        [
+          {
+            "node": "Translate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "34516779-caed-42ac-a466-0620a8f38cac",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "05b6cd2a19105bc7bc8aa65e5b3d953e66815a0e3658654251b6cb708fce0670"
+  },
+  "id": "AwtTwk5unzHk7mAn",
+  "tags": []
+}
